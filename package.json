@@ -1,0 +1,29 @@
+{
+  "name": "BitBlab",
+  "version": "0.0.1",
+  "description": "New version of the BitBlab chat server",
+  "main": "lib/index",
+  "scripts": {
+    "start": "npm run build:live",
+    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BitBlab/BitBlab.git"
+  },
+  "keywords": [],
+  "contributors": [],
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/BitBlab/BitBlab/issues"
+  },
+  "homepage": "https://github.com/BitBlab/BitBlab",
+  "devDependencies": {
+    "@types/node": "^9.4.0",
+    "nodemon": "^1.14.11",
+    "ts-node": "^4.1.0",
+    "typescript": "^2.6.2"
+  },
+  "types": "lib/index"
+}
