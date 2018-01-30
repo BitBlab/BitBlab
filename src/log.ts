@@ -22,11 +22,25 @@
 
 import * as colors from "colors";
 
-class Logger {
-	private colorful: boolean;
+export enum LogLevel {
+	DEBUG = 0,
+	INFO = 1,
+	WARN = 2,
+	ERROR = 3,
+	FATAL = 4
+}
 
-	constructor(colorful: boolean) {
-		this.colorful = colorful;
+class Logger {
+	private colorful: boolean = true;
+	private level: number = LogLevel.DEBUG;
+	private TAG: string[] = ["DEBUG", "INFO", "WARN", "ERROR", "FATAL"];
+
+	constructor(level?: LogLevel, colorful?: boolean) {
+		if(colorful !== undefined)
+			this.colorful = colorful;
+		if(level !== undefined)
+			this.level = level;
+		
 	}
 
 	/* Config Methods */
@@ -34,54 +48,63 @@ class Logger {
 		this.colorful = colorful;
 	}
 
+	public setLevel(level: LogLevel) {
+		this.level = level;
+	}
+
 	/* Logging Methods */
-	public debug(msg: any) {
-		var out = "[DEBUG] " + msg;
-		if(this.colorful){
-			out = colors.bold(out);
-			out = colors.cyan(out);
+	public log(level: LogLevel, msg: any) {
+		if(level < this.level)
+			return;
+
+		var out = "[" + this.TAG[level] + "] " + msg;
+		out = colors.bold(out);
+		switch(level) {
+			case LogLevel.DEBUG:
+				out = colors.cyan(out);
+				break;
+			case LogLevel.INFO:
+				out = colors.white(out);
+				break;
+			case LogLevel.WARN:
+				out = colors.yellow(out);
+				break;
+			case LogLevel.ERROR:
+				out = colors.red(out);
+				break;
+			case LogLevel.FATAL:
+				out = colors.bgRed(out);
+				out = colors.yellow(out);
+				break;
 		}
 		console.log(out);
+	}
+
+	public debug(msg: any) {
+		this.log(LogLevel.DEBUG, msg);
 	}
 
 	public info(msg: any) {
-		var out = "[INFO] " + msg;
-		if(this.colorful){
-			out = colors.bold(out);
-			out = colors.white(out);
-		}
-		console.log(out);
+		this.log(LogLevel.INFO, msg);
 	}
 
 	public warn(msg: any) {
-		var out = "[WARN] " + msg;
-		if(this.colorful){
-			out = colors.bold(out);
-			out = colors.yellow(out);
-		}
-		console.log(out);
+		this.log(LogLevel.WARN, msg);
 	}
 
 	public error(msg: any) {
-		var out = "[ERROR] " + msg;
-		if(this.colorful){
-			out = colors.bold(out);
-			out = colors.red(out);
-		}
-		console.log(out);
+		this.log(LogLevel.ERROR, msg);
 	}
 
 	public fatal(msg: any) {
-		var out = "[FATAL] " + msg;
-		if(this.colorful) {
-			out = colors.bgRed(out);
-			out = colors.yellow(out);
-			out = colors.bold(out);
-		}
-		console.log(out);
+		this.log(LogLevel.FATAL, msg);
 	}
 
 	/* Shorthand Logging */
+	public l(level: LogLevel, msg: any) {
+		this.log(level, msg);
+	}
+	
 	public d(msg: any) {
 		this.debug(msg);
 	}
@@ -104,5 +127,5 @@ class Logger {
 }
 
 
-
 export {Logger};
+//export {LogLevel}

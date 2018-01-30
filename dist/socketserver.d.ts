@@ -6,7 +6,7 @@ declare class SocketServer {
     private io;
     private users;
     private log;
-    constructor(app: ExpressApp, log: Logger);
+    constructor(app: ExpressApp, log?: Logger);
     private setupServer();
     setLogger(log: Logger): void;
     getLogger(): Logger;

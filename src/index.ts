@@ -30,10 +30,10 @@ import Database       from "./database";
 import {ExpressApp}   from "./expressapp";
 import {SocketServer} from "./socketserver"
 
-import {Logger} from "./log";
+import {Logger, LogLevel} from "./log";
 
 /* Globals */
-const log = new Logger(true);
+const log = new Logger(LogLevel.DEBUG, true);
 var app = new ExpressApp();
 var ss: SocketServer;
 

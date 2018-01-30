@@ -36,7 +36,7 @@ class SocketServer {
 
 	private log: Logger;
 
-	constructor(app: ExpressApp, log: Logger) {
+	constructor(app: ExpressApp, log?: Logger) {
 		this.app = app;
 		if(log)
 			this.log = log;
