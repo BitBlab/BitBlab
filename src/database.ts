@@ -16,26 +16,24 @@
  *
  *************************************************************************
  *
- * This is the main entrypoint for the BitBlab Server application.
+ * This file contains the database class used by the server to store users
+ * and other data.
  *
  */
 
 /* Imports */
-import * as bcrypt   from "bcrypt";
-import * as socketio from "socket.io";
-import * as path     from "path";
-import * as http     from "http";
+import * as sqlite from "sqlite3";
+import * as fs     from "fs";
 
-import Database   from "./database";
-import ExpressApp from "./expressapp";
-
-import {Logger} from "./log";
-
-/* Globals */
-const log = new Logger(true);
-
-/* Program Main */
-log.i("Starting BitBlab...")
+/* Classes */
+class Database {
+	constructor(filePath: string) {
+		
+	}
 
 
-log.i("Stopping BitBlab...");
+}
+
+/* Exports */
+export {Database}
+export default new Database("db.sqlite");

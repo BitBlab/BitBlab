@@ -1,3 +1,4 @@
+"use strict";
 /**
  * This file is part of BitBlab.
  *
@@ -19,23 +20,9 @@
  * This is the main entrypoint for the BitBlab Server application.
  *
  */
-
-/* Imports */
-import * as bcrypt   from "bcrypt";
-import * as socketio from "socket.io";
-import * as path     from "path";
-import * as http     from "http";
-
-import Database   from "./database";
-import ExpressApp from "./expressapp";
-
-import {Logger} from "./log";
-
+Object.defineProperty(exports, "__esModule", { value: true });
+var log_1 = require("./log");
 /* Globals */
-const log = new Logger(true);
-
+var log = new log_1.Logger(true);
 /* Program Main */
-log.i("Starting BitBlab...")
-
-
-log.i("Stopping BitBlab...");
+log.debug("test");

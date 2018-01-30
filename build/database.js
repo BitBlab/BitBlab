@@ -1,3 +1,4 @@
+"use strict";
 /**
  * This file is part of BitBlab.
  *
@@ -16,26 +17,16 @@
  *
  *************************************************************************
  *
- * This is the main entrypoint for the BitBlab Server application.
+ * This file contains the database class used by the server to store users
+ * and other data.
  *
  */
-
-/* Imports */
-import * as bcrypt   from "bcrypt";
-import * as socketio from "socket.io";
-import * as path     from "path";
-import * as http     from "http";
-
-import Database   from "./database";
-import ExpressApp from "./expressapp";
-
-import {Logger} from "./log";
-
-/* Globals */
-const log = new Logger(true);
-
-/* Program Main */
-log.i("Starting BitBlab...")
-
-
-log.i("Stopping BitBlab...");
+Object.defineProperty(exports, "__esModule", { value: true });
+/* Classes */
+var Database = /** @class */ (function () {
+    function Database(filePath) {
+    }
+    return Database;
+}());
+exports.Database = Database;
+exports.default = new Database("db.sqlite");
