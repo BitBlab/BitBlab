@@ -1,5 +1,7 @@
 /// <reference types="express" />
+/// <reference types="node" />
 import * as express from "express";
+import * as http from "http";
 import { Logger } from "./log";
 declare class ExpressApp {
     private app;
@@ -8,6 +10,7 @@ declare class ExpressApp {
     constructor();
     private configureApp();
     getApp(): express.Express;
+    getServer(): http.Server;
     setLogger(log: Logger): void;
     getLogger(): Logger;
     listen(): void;

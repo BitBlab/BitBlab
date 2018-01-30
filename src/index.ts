@@ -26,14 +26,16 @@ import * as socketio from "socket.io";
 import * as path     from "path";
 import * as http     from "http";
 
-import Database     from "./database";
-import {ExpressApp} from "./expressapp";
+import Database       from "./database";
+import {ExpressApp}   from "./expressapp";
+import {SocketServer} from "./socketserver"
 
 import {Logger} from "./log";
 
 /* Globals */
 const log = new Logger(true);
 var app = new ExpressApp();
+var ss: SocketServer;
 
 /* Functions */
 function stopServer() {
@@ -50,6 +52,7 @@ log.i("Starting BitBlab...")
 // Setup Express
 app.setLogger(log);
 app.listen();
+ss = new SocketServer(app, log);
 
 // Setup Graceful Exiting
 process.on("SIGTERM", stopServer);

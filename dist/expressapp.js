@@ -54,6 +54,9 @@ var ExpressApp = /** @class */ (function () {
     ExpressApp.prototype.getApp = function () {
         return this.app;
     };
+    ExpressApp.prototype.getServer = function () {
+        return this.server;
+    };
     ExpressApp.prototype.setLogger = function (log) {
         this.log = log;
     };
@@ -71,7 +74,7 @@ var ExpressApp = /** @class */ (function () {
     ExpressApp.prototype.stop = function (callback) {
         var _this = this;
         if (this.log)
-            this.log.i("Stopping Express Server...");
+            this.log.i("Stopping Express Server (10s timeout)...");
         this.server.close(function () {
             if (_this.log)
                 _this.log.i("Express Server Stopped.");

@@ -17,31 +17,19 @@
  *
  *************************************************************************
  *
- * This is the main entrypoint for the BitBlab Server application.
+ * This file contains user-related classes
  *
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var expressapp_1 = require("./expressapp");
-var socketserver_1 = require("./socketserver");
-var log_1 = require("./log");
-/* Globals */
-var log = new log_1.Logger(true);
-var app = new expressapp_1.ExpressApp();
-var ss;
-/* Functions */
-function stopServer() {
-    log.i("Stopping BitBlab...");
-    app.stop(function () {
-        log.i("Exiting.");
-        process.exit();
-    });
-}
-/* Program Main */
-log.i("Starting BitBlab...");
-// Setup Express
-app.setLogger(log);
-app.listen();
-ss = new socketserver_1.SocketServer(app, log);
-// Setup Graceful Exiting
-process.on("SIGTERM", stopServer);
-process.on("SIGINT", stopServer);
+/* Imports */
+/* Classes */
+var User = /** @class */ (function () {
+    function User(socket) {
+        this.socket = socket;
+    }
+    /* Private Methods */
+    User.prototype.setupSocket = function () {
+    };
+    return User;
+}());
+exports.User = User;

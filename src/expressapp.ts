@@ -65,6 +65,10 @@ class ExpressApp {
 		return this.app;
 	}
 
+	public getServer(): http.Server {
+		return this.server;
+	}
+
 	public setLogger(log: Logger) {
 		this.log = log;
 	}
@@ -85,7 +89,7 @@ class ExpressApp {
 	public stop(callback: Function) {
 		const _this = this;
 		if(this.log)
-			this.log.i("Stopping Express Server...");
+			this.log.i("Stopping Express Server (10s timeout)...");
 
 		this.server.close(function() {
 			if(_this.log)

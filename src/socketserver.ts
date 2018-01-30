@@ -20,4 +20,61 @@
  * Socket.io server used by the chat server.
  *
  */
+
+/* Imports */
+import * as socketio from "socket.io"
+
 import {ExpressApp} from "./expressapp"
+import {User}       from "./user"
+import {Logger}     from "./log"
+
+/* Classes */
+class SocketServer {
+	private app: ExpressApp;
+	private io: SocketIO.Server;
+	private users: User[];
+
+	private log: Logger;
+
+	constructor(app: ExpressApp, log: Logger) {
+		this.app = app;
+		if(log)
+			this.log = log;
+		this.io = socketio.listen(app.getServer());
+
+		this.setupServer();
+		if(this.log)
+			this.log.i("Socket.IO Server Configured and Listening");
+	}
+
+	/* Private Methods */
+	private setupServer() {
+		let io = this.io;
+		let log = this.log;
+		let _this = this;
+
+		io.sockets.on("connection", function(socket) {
+			if(log)
+				log.d("Socket Connected: " + socket.id);
+			var user = new User(socket);
+			_this.users.push(user);
+		});
+	}
+
+	/* Getters and Setters */
+	public setLogger(log: Logger) {
+		this.log = log;
+	}
+	public getLogger(): Logger {
+		return this.log;
+	}
+	public getUsers(): User[] {
+		return this.users;
+	}
+
+	/* Other Public Methods */
+
+}
+
+/* Exports */
+export {SocketServer}
