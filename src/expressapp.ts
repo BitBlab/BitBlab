@@ -34,17 +34,23 @@ import * as morgan         from "morgan";
 import * as bodyParser     from "body-parser";
 import * as methodOverride from "method-override";
 import * as serveStatic    from "serve-static";
+import * as errorHandler   from "errorhandler";
 import * as path           from "path";
+import * as http           from "http";
+
+import {Logger} from "./log";
 
 /* Classes */
 class ExpressApp {
-	public app: express.Express;
+	private app: express.Express;
+	private server: http.Server;
+	private log: Logger;
 
 	constructor() {
 		this.app = express();
 		this.configureApp();
 	}
-
+	/* Private Methods */
 	private configureApp() {
 		this.app.set('port', process.env.PORT || PORT);
 		this.app.use(morgan(MORGAN_MODE));
@@ -53,7 +59,47 @@ class ExpressApp {
 		this.app.use(methodOverride());
 		this.app.use(serveStatic(path.join(__dirname, PUBLIC_FOLDER)));
 	}
+
+	/* Getter and Setter Methods */
+	public getApp(): express.Express {
+		return this.app;
+	}
+
+	public setLogger(log: Logger) {
+		this.log = log;
+	}
+
+	public getLogger(): Logger {
+		return this.log;
+	}
+
+	/* Other Public Methods */
+	public listen() {
+		const _this = this;
+		this.server = this.app.listen(this.app.get("port"), function(){
+			if(_this.log)
+				_this.log.i("Express Server Listening on " + _this.app.get("port"));
+		});
+	}
+
+	public stop(callback: Function) {
+		const _this = this;
+		if(this.log)
+			this.log.i("Stopping Express Server...");
+
+		this.server.close(function() {
+			if(_this.log)
+				_this.log.i("Express Server Stopped.");
+			callback();
+		});
+
+		setTimeout(function() {
+			if(_this.log)
+				_this.log.w("Express Failed to Close Connections!");
+			callback();
+		}, 10000); //timeout after 10 sec
+	}
 }
 
 /* Exports */
-export default new ExpressApp().app;
+export {ExpressApp};

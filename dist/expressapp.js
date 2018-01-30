@@ -41,6 +41,7 @@ var ExpressApp = /** @class */ (function () {
         this.app = express();
         this.configureApp();
     }
+    /* Private Methods */
     ExpressApp.prototype.configureApp = function () {
         this.app.set('port', process.env.PORT || PORT);
         this.app.use(morgan(MORGAN_MODE));
@@ -49,7 +50,39 @@ var ExpressApp = /** @class */ (function () {
         this.app.use(methodOverride());
         this.app.use(serveStatic(path.join(__dirname, PUBLIC_FOLDER)));
     };
+    /* Getter and Setter Methods */
+    ExpressApp.prototype.getApp = function () {
+        return this.app;
+    };
+    ExpressApp.prototype.setLogger = function (log) {
+        this.log = log;
+    };
+    ExpressApp.prototype.getLogger = function () {
+        return this.log;
+    };
+    /* Other Public Methods */
+    ExpressApp.prototype.listen = function () {
+        var _this = this;
+        this.server = this.app.listen(this.app.get("port"), function () {
+            if (_this.log)
+                _this.log.i("Express Server Listening on " + _this.app.get("port"));
+        });
+    };
+    ExpressApp.prototype.stop = function (callback) {
+        var _this = this;
+        if (this.log)
+            this.log.i("Stopping Express Server...");
+        this.server.close(function () {
+            if (_this.log)
+                _this.log.i("Express Server Stopped.");
+            callback();
+        });
+        setTimeout(function () {
+            if (_this.log)
+                _this.log.w("Express Failed to Close Connections!");
+            callback();
+        }, 10000); //timeout after 10 sec
+    };
     return ExpressApp;
 }());
-/* Exports */
-exports.default = new ExpressApp().app;
+exports.ExpressApp = ExpressApp;

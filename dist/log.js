@@ -33,35 +33,60 @@ var Logger = /** @class */ (function () {
     /* Logging Methods */
     Logger.prototype.debug = function (msg) {
         var out = "[DEBUG] " + msg;
-        if (this.colorful)
+        if (this.colorful) {
+            out = colors.bold(out);
             out = colors.cyan(out);
+        }
         console.log(out);
     };
     Logger.prototype.info = function (msg) {
         var out = "[INFO] " + msg;
-        if (this.colorful)
+        if (this.colorful) {
+            out = colors.bold(out);
             out = colors.white(out);
+        }
         console.log(out);
     };
     Logger.prototype.warn = function (msg) {
         var out = "[WARN] " + msg;
-        if (this.colorful)
+        if (this.colorful) {
+            out = colors.bold(out);
             out = colors.yellow(out);
+        }
         console.log(out);
     };
     Logger.prototype.error = function (msg) {
         var out = "[ERROR] " + msg;
-        if (this.colorful)
+        if (this.colorful) {
+            out = colors.bold(out);
             out = colors.red(out);
+        }
         console.log(out);
     };
     Logger.prototype.fatal = function (msg) {
         var out = "[FATAL] " + msg;
         if (this.colorful) {
-            out = colors.red(out);
+            out = colors.bgRed(out);
+            out = colors.yellow(out);
             out = colors.bold(out);
         }
         console.log(out);
+    };
+    /* Shorthand Logging */
+    Logger.prototype.d = function (msg) {
+        this.debug(msg);
+    };
+    Logger.prototype.i = function (msg) {
+        this.info(msg);
+    };
+    Logger.prototype.w = function (msg) {
+        this.warn(msg);
+    };
+    Logger.prototype.e = function (msg) {
+        this.error(msg);
+    };
+    Logger.prototype.f = function (msg) {
+        this.fatal(msg);
     };
     return Logger;
 }());

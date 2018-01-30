@@ -16,41 +16,8 @@
  *
  *************************************************************************
  *
- * This is the main entrypoint for the BitBlab Server application.
+ * This file contains the SocketServer class that is used to create the 
+ * Socket.io server used by the chat server.
  *
  */
-
-/* Imports */
-import * as bcrypt   from "bcrypt";
-import * as socketio from "socket.io";
-import * as path     from "path";
-import * as http     from "http";
-
-import Database     from "./database";
-import {ExpressApp} from "./expressapp";
-
-import {Logger} from "./log";
-
-/* Globals */
-const log = new Logger(true);
-var app = new ExpressApp();
-
-/* Functions */
-function stopServer() {
-	log.i("Stopping BitBlab...");
-	app.stop(function() {
-		log.i("Exiting.");
-		process.exit();
-	});
-}
-
-/* Program Main */
-log.i("Starting BitBlab...")
-
-// Setup Express
-app.setLogger(log);
-app.listen();
-
-// Setup Graceful Exiting
-process.on("SIGTERM", stopServer);
-process.on("SIGINT", stopServer);
+import {ExpressApp} from "./expressapp"

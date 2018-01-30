@@ -21,8 +21,24 @@
  *
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+var expressapp_1 = require("./expressapp");
 var log_1 = require("./log");
 /* Globals */
 var log = new log_1.Logger(true);
+var app = new expressapp_1.ExpressApp();
+/* Functions */
+function stopServer() {
+    log.i("Stopping BitBlab...");
+    app.stop(function () {
+        log.i("Exiting.");
+        process.exit();
+    });
+}
 /* Program Main */
-log.debug("test");
+log.i("Starting BitBlab...");
+// Setup Express
+app.setLogger(log);
+app.listen();
+// Setup Graceful Exiting
+process.on("SIGTERM", stopServer);
+process.on("SIGINT", stopServer);

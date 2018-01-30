@@ -1,0 +1,2 @@
+This folder contains all the files needed to run the BitBlab server. Generated files from the TypeScript compiler get placed here, whereas publicly served static files are in the public folder.
+You can edit files in public/, but NOT this directory.
