@@ -1,3 +1,4 @@
+## GitHub Node Defaults ##
 # Logs
 logs
 *.log
@@ -57,5 +58,8 @@ typings/
 # dotenv environment variables file
 .env
 
-# Custom
-db.sqlite # the default database file
+## Custom ##
+# the default database file
+db.sqlite
+# code/files that are used by the server but should not get committed to the repo
+private/
