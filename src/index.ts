@@ -26,16 +26,20 @@ import * as socketio from "socket.io";
 import * as path     from "path";
 import * as http     from "http";
 
-import Database       from "./database";
+import {Database}       from "./database";
 import {ExpressApp}   from "./expressapp";
 import {SocketServer} from "./socketserver"
 
 import {Logger, LogLevel} from "./log";
 
+/* Constants */
+const DB_FILE = "db.sqlite";
+
 /* Globals */
 const log = new Logger(LogLevel.DEBUG, true);
 var app = new ExpressApp();
 var ss: SocketServer;
+var db: Database;
 
 /* Functions */
 function stopServer() {
@@ -53,6 +57,15 @@ log.i("Starting BitBlab...")
 app.setLogger(log);
 app.listen();
 ss = new SocketServer(app, log);
+db = new Database(DB_FILE, function(success: boolean){
+	if(!success){
+		log.f("Required Database Creating Failed! Shutting down.");
+		stopServer();
+	}
+}, log);
+
+
+log.i("BitBlab started!");
 
 // Setup Graceful Exiting
 process.on("SIGTERM", stopServer);

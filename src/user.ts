@@ -24,7 +24,15 @@
 
 /* Classes */
 class User {
+	/* General Client Info */
 	private socket: SocketIO.Socket;
+	private isAuthed: boolean = false;
+
+	/* User Account Info */
+	private username: string = "";
+	private userType: number = -1;
+	private colors: string[] = [];
+	private balance: number = 0.0;
 
 	constructor(socket: SocketIO.Socket) {
 		this.socket = socket;

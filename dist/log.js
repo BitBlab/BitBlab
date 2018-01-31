@@ -29,24 +29,26 @@ class Logger {
         if (level < this.level)
             return;
         var out = "[" + this.TAG[level] + "] " + msg;
-        out = colors.bold(out);
-        switch (level) {
-            case LogLevel.DEBUG:
-                out = colors.cyan(out);
-                break;
-            case LogLevel.INFO:
-                out = colors.white(out);
-                break;
-            case LogLevel.WARN:
-                out = colors.yellow(out);
-                break;
-            case LogLevel.ERROR:
-                out = colors.red(out);
-                break;
-            case LogLevel.FATAL:
-                out = colors.bgRed(out);
-                out = colors.yellow(out);
-                break;
+        if (this.colorful) {
+            out = colors.bold(out);
+            switch (level) {
+                case LogLevel.DEBUG:
+                    out = colors.cyan(out);
+                    break;
+                case LogLevel.INFO:
+                    out = colors.white(out);
+                    break;
+                case LogLevel.WARN:
+                    out = colors.yellow(out);
+                    break;
+                case LogLevel.ERROR:
+                    out = colors.red(out);
+                    break;
+                case LogLevel.FATAL:
+                    out = colors.bgRed(out);
+                    out = colors.yellow(out);
+                    break;
+            }
         }
         console.log(out);
     }
