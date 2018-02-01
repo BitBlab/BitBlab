@@ -39,6 +39,8 @@ class Database {
                 }).catch(() => {
                     if (log)
                         log.f("Database Error During Initialization!");
+                    if (callback)
+                        callback(false);
                 });
             }
         });
@@ -52,8 +54,8 @@ class Database {
             else {
                 db.all("SELECT name FROM sqlite_master WHERE type='table' AND NOT name='sqlite_master'", (err, rows) => {
                     if (err) {
-                        log.e("Database check query failed! Error:\n" + err);
-                        resolve(false);
+                        log.e("Database check query failed! " + err);
+                        reject(err);
                     }
                     if (rows && rows.length > 0)
                         resolve(true);
@@ -66,11 +68,12 @@ class Database {
     }
     checkIntegrity() {
         var promise = new Promise((resolve, reject) => {
-            resolve();
+            resolve(false);
         });
         return promise;
     }
     initDB() {
+        let db = this.db;
         var promise = new Promise((resolve, reject) => {
             resolve();
         });

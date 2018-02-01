@@ -13,7 +13,7 @@ declare class ExpressApp {
     getServer(): http.Server;
     setLogger(log: Logger): void;
     getLogger(): Logger;
-    listen(): void;
+    listen(callback?: Function): void;
     stop(callback: Function): void;
 }
 export { ExpressApp };

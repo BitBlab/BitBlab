@@ -60,8 +60,9 @@ db = new Database(DB_FILE, function(success: boolean){
 		stopServer();
 	}else{
 		app.setLogger(log);
-		app.listen();
-		ss = new SocketServer(app, log);
+		app.listen(function(){
+			ss = new SocketServer(app, log);
+		});
 	}
 }, log);
 

@@ -70,6 +70,8 @@ class Database {
 				}).catch(() => {
 					if(log)
 						log.f("Database Error During Initialization!");
+					if(callback)
+						callback(false);
 				});
 				
 			}
@@ -97,8 +99,8 @@ class Database {
 		 					(err, rows) => 
 		 						{
 		 							if(err) {
-		 								log.e("Database check query failed! Error:\n" + err);
-		 								resolve(false);
+		 								log.e("Database check query failed! " + err);
+		 								reject(err);
 		 							}
 		 							if(rows && rows.length > 0)
 		 								resolve(true);

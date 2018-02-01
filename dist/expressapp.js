@@ -34,15 +34,21 @@ class ExpressApp {
     getLogger() {
         return this.log;
     }
-    listen() {
+    listen(callback) {
         const _this = this;
         this.server = this.app.listen(this.app.get("port"), function () {
             if (_this.log)
                 _this.log.i("Express Server Listening on " + _this.app.get("port"));
+            if (callback)
+                callback();
         });
     }
     stop(callback) {
         const _this = this;
+        if (!this.server) {
+            callback();
+            return;
+        }
         if (this.log)
             this.log.i("Stopping Express Server (10s timeout)...");
         this.server.close(function () {

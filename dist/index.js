@@ -12,7 +12,7 @@ var db;
 function stopServer() {
     log.i("Stopping BitBlab...");
     app.stop(function () {
-        log.i("Exiting.");
+        log.i("Process Exiting.");
         process.exit();
     });
 }
@@ -24,8 +24,9 @@ db = new database_1.Database(DB_FILE, function (success) {
     }
     else {
         app.setLogger(log);
-        app.listen();
-        ss = new socketserver_1.SocketServer(app, log);
+        app.listen(function () {
+            ss = new socketserver_1.SocketServer(app, log);
+        });
     }
 }, log);
 log.i("BitBlab started!");
