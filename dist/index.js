@@ -17,13 +17,15 @@ function stopServer() {
     });
 }
 log.i("Starting BitBlab...");
-app.setLogger(log);
-app.listen();
-ss = new socketserver_1.SocketServer(app, log);
 db = new database_1.Database(DB_FILE, function (success) {
     if (!success) {
-        log.f("Required Database Creating Failed! Shutting down.");
+        log.f("Required Database Setup Failed! Shutting down.");
         stopServer();
+    }
+    else {
+        app.setLogger(log);
+        app.listen();
+        ss = new socketserver_1.SocketServer(app, log);
     }
 }, log);
 log.i("BitBlab started!");

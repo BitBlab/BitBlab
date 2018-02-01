@@ -52,29 +52,32 @@ class Database {
 				if(callback)
 					callback(false);
 			}else{
-				if(!_this.isAlreadyDB()) {
-					_this.initDB();
+				_this.isAlreadyDB().then(function(isDB):Promise<any> {
+					if(isDB) {
+						if(log)
+							log.d("is db");
+						return _this.checkIntegrity();
+					}else{
+						if(log)
+							log.d("is not db");
+						return _this.initDB();
+						
+					}
+				}).then((val: any) => {
 					_this.ready = true;
 					if(callback)
 						callback(true);
-				}else{
-					if(_this.checkIntegrity()) {
-
-					}else{
-						if(log)
-							log.f("DB Exists but has errors!");
-						if(callback)
-							callback(false);
-					}
-				}
-
+				}).catch(() => {
+					if(log)
+						log.f("Database Error During Initialization!");
+				});
 				
 			}
 		});
 	}
 
 	/* Private Methods */
-	private isAlreadyDB(): boolean {
+	private isAlreadyDB(): Promise<boolean> {
 		/* todo here: check if the database has any tables/data at all
 		 * if it does, return true
 		 * if not, return false
@@ -82,20 +85,60 @@ class Database {
 		 * note: this is not supposed to check if the tables are correct, see
 		 * checkIntegrity() for that
 		 */
-		return false;
+		 let db = this.db;
+		 let log = this.log;
+		 var promise = new Promise<boolean>(
+		 	(resolve, reject) =>
+		 		{
+		 			if(db === undefined)
+		 				reject();
+		 			else {
+		 				db.all("SELECT name FROM sqlite_master WHERE type='table' AND NOT name='sqlite_master'", 
+		 					(err, rows) => 
+		 						{
+		 							if(err) {
+		 								log.e("Database check query failed! Error:\n" + err);
+		 								resolve(false);
+		 							}
+		 							if(rows && rows.length > 0)
+		 								resolve(true);
+		 							else
+		 								resolve(false);
+		 						}
+		 					);
+		 			}
+		 		}
+		 	);
+
+		return promise;
 	}
-	private checkIntegrity(): boolean {
+	private checkIntegrity(): Promise<boolean> {
 		/* todo here: do quick checks on the tables.
 		 * if the tables are ok, return true
 		 * if not, attempt to fix them (if possible)
 		 * if fixing succeeds, return true, else return false
 		 */
-		return false;
+		 var promise = new Promise<boolean>(
+		 	(resolve, reject) => {
+		 		resolve(false);
+		 	}
+		 );
+
+		return promise;
 	}
-	private initDB() {
+	private initDB(): Promise<void> {
 		/* todo here: create a new database with the correct table structure.
 		 * this should only be called by the constructor if isAlreadyDB() is false
 		 */
+		 let db = this.db;
+		 var promise = new Promise<void>(
+		 	(resolve, reject) => {
+		 		resolve();
+		 	}
+		 );
+
+
+		 return promise;
 	}
 
 	/* Getters and Setters */

@@ -32,13 +32,13 @@
     "@types/serve-static": "^1.13.1",
     "@types/socket.io": "^1.4.31",
     "@types/sqlite3": "^3.1.1",
-    "bcrypt": "^1.0.3",
     "nodemon": "^1.14.11",
     "ts-node": "^4.1.0",
     "typescript": "^2.6.2"
   },
   "types": "lib/index",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "colors": "^1.1.2",
     "errorhandler": "^1.5.0",

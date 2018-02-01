@@ -21,32 +21,60 @@ class Database {
                     callback(false);
             }
             else {
-                if (!_this.isAlreadyDB()) {
-                    _this.initDB();
-                    _this.ready = true;
-                    if (callback)
-                        callback(true);
-                }
-                else {
-                    if (_this.checkIntegrity()) {
+                _this.isAlreadyDB().then(function (isDB) {
+                    if (isDB) {
+                        if (log)
+                            log.d("is db");
+                        return _this.checkIntegrity();
                     }
                     else {
                         if (log)
-                            log.f("DB Exists but has errors!");
-                        if (callback)
-                            callback(false);
+                            log.d("is not db");
+                        return _this.initDB();
                     }
-                }
+                }).then((val) => {
+                    _this.ready = true;
+                    if (callback)
+                        callback(true);
+                }).catch(() => {
+                    if (log)
+                        log.f("Database Error During Initialization!");
+                });
             }
         });
     }
     isAlreadyDB() {
-        return false;
+        let db = this.db;
+        let log = this.log;
+        var promise = new Promise((resolve, reject) => {
+            if (db === undefined)
+                reject();
+            else {
+                db.all("SELECT name FROM sqlite_master WHERE type='table' AND NOT name='sqlite_master'", (err, rows) => {
+                    if (err) {
+                        log.e("Database check query failed! Error:\n" + err);
+                        resolve(false);
+                    }
+                    if (rows && rows.length > 0)
+                        resolve(true);
+                    else
+                        resolve(false);
+                });
+            }
+        });
+        return promise;
     }
     checkIntegrity() {
-        return false;
+        var promise = new Promise((resolve, reject) => {
+            resolve();
+        });
+        return promise;
     }
     initDB() {
+        var promise = new Promise((resolve, reject) => {
+            resolve();
+        });
+        return promise;
     }
     isReady() {
         return this.ready;

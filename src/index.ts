@@ -45,7 +45,7 @@ var db: Database;
 function stopServer() {
 	log.i("Stopping BitBlab...");
 	app.stop(function() {
-		log.i("Exiting.");
+		log.i("Process Exiting.");
 		process.exit();
 	});
 }
@@ -53,14 +53,15 @@ function stopServer() {
 /* Program Main */
 log.i("Starting BitBlab...")
 
-// Setup Express
-app.setLogger(log);
-app.listen();
-ss = new SocketServer(app, log);
+
 db = new Database(DB_FILE, function(success: boolean){
 	if(!success){
-		log.f("Required Database Creating Failed! Shutting down.");
+		log.f("Required Database Setup Failed! Shutting down.");
 		stopServer();
+	}else{
+		app.setLogger(log);
+		app.listen();
+		ss = new SocketServer(app, log);
 	}
 }, log);
 
