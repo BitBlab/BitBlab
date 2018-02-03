@@ -2,6 +2,20 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const sqlite = require("sqlite3");
 const fs = require("fs");
+const TABLE_USER_SQL = "CREATE TABLE IF NOT EXISTS users (" +
+    "id PRIMARY KEY," +
+    "username text NOT NULL," +
+    "password text NOT NULL," +
+    "salt text NOT NULL," +
+    "type integer NOT NULL," +
+    "balance real NOT NULL)";
+const TABLE_ROOM_SQL = "CREATE TABLE IF NOT EXISTS rooms (" +
+    "id PRIMARY KEY," +
+    "name text NOT NULL," +
+    "owner text NOT NULL," +
+    "topic text NOT NULL," +
+    "private integer NOT NULL," +
+    "allowed_users text)";
 class Database {
     constructor(filePath, callback, log) {
         this.ready = false;
@@ -33,6 +47,13 @@ class Database {
                         return _this.initDB();
                     }
                 }).then((val) => {
+                    if (val !== undefined && val === false) {
+                        if (log)
+                            log.e("Database failed integrity check!");
+                        if (callback)
+                            callback(false);
+                        return;
+                    }
                     _this.ready = true;
                     if (callback)
                         callback(true);
@@ -67,15 +88,62 @@ class Database {
         return promise;
     }
     checkIntegrity() {
+        let db = this.db;
+        let log = this.log;
         var promise = new Promise((resolve, reject) => {
-            resolve(false);
+            if (!db)
+                reject();
+            db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'", (err, row) => {
+                if (err) {
+                    if (log)
+                        log.e(err);
+                    resolve(false);
+                }
+                else {
+                    if (row.sql != TABLE_USER_SQL) {
+                        if (log)
+                            log.d(row.sql);
+                        resolve(false);
+                    }
+                    else {
+                        db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='rooms'", (err, row) => {
+                            if (err) {
+                                if (log)
+                                    log.e(err);
+                                resolve(false);
+                            }
+                            else {
+                                if (row.sql != TABLE_ROOM_SQL) {
+                                    if (log)
+                                        log.d(row.sql);
+                                    resolve(false);
+                                }
+                                else
+                                    resolve(true);
+                            }
+                        });
+                    }
+                }
+            });
         });
         return promise;
     }
     initDB() {
         let db = this.db;
         var promise = new Promise((resolve, reject) => {
-            resolve();
+            db.run(TABLE_USER_SQL, (err) => {
+                if (!err) {
+                    db.run(TABLE_ROOM_SQL, (err) => {
+                        if (err)
+                            reject(err);
+                        else
+                            resolve();
+                    });
+                }
+                else {
+                    reject(err);
+                }
+            });
         });
         return promise;
     }
@@ -85,10 +153,34 @@ class Database {
     hasError() {
         return !this.error;
     }
+    getRawDB() {
+        if (this.ready)
+            return this.db;
+        else
+            return null;
+    }
     close() {
-        if (this.log)
-            this.log.i("Closing Database...");
-        this.db.close();
+        let log = this.log;
+        let db = this.db;
+        var promise = new Promise((resolve, reject) => {
+            if (!db) {
+                reject();
+                return;
+            }
+            if (log)
+                log.i("Closing Database...");
+            db.close((err) => {
+                if (err) {
+                    if (log)
+                        log.e(err);
+                    resolve(false);
+                }
+                else {
+                    resolve(true);
+                }
+            });
+        });
+        return promise;
     }
 }
 exports.Database = Database;

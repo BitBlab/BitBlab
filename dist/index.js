@@ -12,10 +12,17 @@ var db;
 function stopServer() {
     log.i("Stopping BitBlab...");
     app.stop(function () {
-        log.i("Process Exiting.");
-        process.exit();
+        db.close().then((success) => {
+            if (!success)
+                if (log)
+                    log.e("Database did not close nicely!");
+            log.i("Process Exiting.");
+            process.exit();
+        });
     });
 }
+process.on("SIGTERM", stopServer);
+process.on("SIGINT", stopServer);
 log.i("Starting BitBlab...");
 db = new database_1.Database(DB_FILE, function (success) {
     if (!success) {
@@ -23,6 +30,7 @@ db = new database_1.Database(DB_FILE, function (success) {
         stopServer();
     }
     else {
+        log.i("Database Ready!");
         app.setLogger(log);
         app.listen(function () {
             ss = new socketserver_1.SocketServer(app, log);
@@ -30,5 +38,3 @@ db = new database_1.Database(DB_FILE, function (success) {
     }
 }, log);
 log.i("BitBlab started!");
-process.on("SIGTERM", stopServer);
-process.on("SIGINT", stopServer);

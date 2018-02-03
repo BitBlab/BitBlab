@@ -27,6 +27,22 @@ import * as fs     from "fs";
 
 import {Logger} from "./log"
 
+/* Constants */
+const TABLE_USER_SQL = "CREATE TABLE IF NOT EXISTS users (" +
+		 			   "id PRIMARY KEY," +
+		 			   "username text NOT NULL," +
+		 			   "password text NOT NULL," +
+		 			   "salt text NOT NULL," +
+		 			   "type integer NOT NULL," +
+		 			   "balance real NOT NULL)";
+const TABLE_ROOM_SQL = "CREATE TABLE IF NOT EXISTS rooms (" +
+		 			   "id PRIMARY KEY," +
+		 			   "name text NOT NULL," +
+		 			   "owner text NOT NULL," +
+		 			   "topic text NOT NULL," +
+		 			   "private integer NOT NULL," +
+		 			   "allowed_users text)";
+
 /* Classes */
 class Database {
 	private log: Logger;
@@ -63,7 +79,14 @@ class Database {
 						return _this.initDB();
 						
 					}
-				}).then((val: any) => {
+				}).then((val?: boolean) => {
+					if(val !== undefined && val === false) { //checkIntegrity returns a boolean
+						if(log)
+							log.e("Database failed integrity check!");
+						if(callback)
+							callback(false);
+						return;
+					}
 					_this.ready = true;
 					if(callback)
 						callback(true);
@@ -120,9 +143,44 @@ class Database {
 		 * if not, attempt to fix them (if possible)
 		 * if fixing succeeds, return true, else return false
 		 */
+		 let db = this.db;
+		 let log = this.log;
 		 var promise = new Promise<boolean>(
 		 	(resolve, reject) => {
-		 		resolve(false);
+		 		if(!db)
+		 			reject();
+
+		 		db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'", (err, row) => {
+		 			if(err){
+		 				if(log)
+		 					log.e(err);
+		 				resolve(false);
+		 			}
+		 			else{
+		 				if(row.sql != TABLE_USER_SQL){
+		 					if(log)
+		 						log.d(row.sql);
+		 					resolve(false);
+		 				}
+		 				else {
+		 					db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='rooms'", (err, row) => {
+		 						if(err){
+					 				if(log)
+					 					log.e(err);
+					 				resolve(false);
+					 			}
+					 			else{
+					 				if(row.sql != TABLE_ROOM_SQL){
+					 					if(log)
+					 						log.d(row.sql);
+					 					resolve(false);
+					 				}else
+					 					resolve(true);
+					 			}
+		 					});
+		 				}
+		 			}
+		 		});
 		 	}
 		 );
 
@@ -135,7 +193,18 @@ class Database {
 		 let db = this.db;
 		 var promise = new Promise<void>(
 		 	(resolve, reject) => {
-		 		resolve();
+		 		db.run(TABLE_USER_SQL, (err) => {
+		 			if(!err) {
+		 				db.run(TABLE_ROOM_SQL, (err) => {
+			 				if(err)
+			 					reject(err);
+			 				else
+			 					resolve();
+			 			});
+		 			}else{
+		 				reject(err);
+		 			}
+		 		});
 		 	}
 		 );
 
@@ -143,20 +212,47 @@ class Database {
 		 return promise;
 	}
 
-	/* Getters and Setters */
+	/* Meta Getters and Setters */
 	public isReady(): boolean {
 		return this.ready;
 	}
 	public hasError(): boolean {
 		return !this.error;
 	}
-
-	/* Other Public Methods */
-	public close() {
-		if(this.log)
-			this.log.i("Closing Database...");
-		this.db.close();
+	public getRawDB(): sqlite.Database|null {
+		if(this.ready)
+			return this.db;
+		else
+			return null;
 	}
+
+	/* Other Meta Public Methods */
+	public close(): Promise<boolean> {
+		let log = this.log;
+		let db = this.db;
+		var promise = new Promise<boolean>(
+			(resolve, reject) => {
+				if(!db) {
+					reject();
+					return;
+				}
+				if(log)
+					log.i("Closing Database...");
+				db.close((err) => {
+					if(err) {
+						if(log)
+							log.e(err);
+						resolve(false);
+					}else{
+						resolve(true);
+					}
+				});
+			}
+		);
+		return promise;
+	}
+
+	/* Database Operation Methods */
 }
 
 /* Exports */

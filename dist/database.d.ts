@@ -1,3 +1,4 @@
+import * as sqlite from "sqlite3";
 import { Logger } from "./log";
 declare class Database {
     private log;
@@ -10,6 +11,7 @@ declare class Database {
     private initDB();
     isReady(): boolean;
     hasError(): boolean;
-    close(): void;
+    getRawDB(): sqlite.Database | null;
+    close(): Promise<boolean>;
 }
 export { Database };
