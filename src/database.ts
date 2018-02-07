@@ -25,7 +25,7 @@
 import * as sqlite from "sqlite3";
 import * as fs     from "fs";
 
-import {Logger} from "./log"
+import {Logger, LogLevel} from "./log"
 
 /* Constants */
 const TABLE_USER_SQL = "CREATE TABLE IF NOT EXISTS users (" +
@@ -55,34 +55,33 @@ class Database {
 
 		if(log)
 			this.log = log;
+		else{
+            this.log = new Logger(LogLevel.INFO);
+        }
+
 		
 		var fileExists = fs.existsSync(filePath);
 
 		this.db = new sqlite.Database(filePath, sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE, function(err){
 			if(err) {
 				_this.error = true;
-				if(log){
-					log.f("Failed to open database '" + filePath + "'!");
-					log.f("Error Message: " + err);
-				}
+                _this.log.f("Failed to open database '" + filePath + "'!");
+                _this.log.f("Error Message: " + err);
 				if(callback)
 					callback(false);
 			}else{
 				_this.isAlreadyDB().then(function(isDB):Promise<any> {
 					if(isDB) {
-						if(log)
-							log.d("is db");
+						_this.log.d("is db");
 						return _this.checkIntegrity();
 					}else{
-						if(log)
-							log.d("is not db");
+						_this.log.d("is not db");
 						return _this.initDB();
 						
 					}
 				}).then((val?: boolean) => {
 					if(val !== undefined && val === false) { //checkIntegrity returns a boolean
-						if(log)
-							log.e("Database failed integrity check!");
+						_this.log.e("Database failed integrity check!");
 						if(callback)
 							callback(false);
 						return;
@@ -91,8 +90,7 @@ class Database {
 					if(callback)
 						callback(true);
 				}).catch(() => {
-					if(log)
-						log.f("Database Error During Initialization!");
+					_this.log.f("Database Error During Initialization!");
 					if(callback)
 						callback(false);
 				});
@@ -152,27 +150,23 @@ class Database {
 
 		 		db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'", (err, row) => {
 		 			if(err){
-		 				if(log)
-		 					log.e(err);
+		 				log.e(err);
 		 				resolve(false);
 		 			}
 		 			else{
 		 				if(row.sql != TABLE_USER_SQL){
-		 					if(log)
-		 						log.d(row.sql);
+		 					log.d(row.sql);
 		 					resolve(false);
 		 				}
 		 				else {
 		 					db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='rooms'", (err, row) => {
 		 						if(err){
-					 				if(log)
-					 					log.e(err);
+					 				log.e(err);
 					 				resolve(false);
 					 			}
 					 			else{
 					 				if(row.sql != TABLE_ROOM_SQL){
-					 					if(log)
-					 						log.d(row.sql);
+					 					log.d(row.sql);
 					 					resolve(false);
 					 				}else
 					 					resolve(true);
@@ -240,8 +234,7 @@ class Database {
 					log.i("Closing Database...");
 				db.close((err) => {
 					if(err) {
-						if(log)
-							log.e(err);
+						log.e(err);
 						resolve(false);
 					}else{
 						resolve(true);

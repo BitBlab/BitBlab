@@ -38,7 +38,7 @@ import * as errorHandler   from "errorhandler";
 import * as path           from "path";
 import * as http           from "http";
 
-import {Logger} from "./log";
+import {Logger, LogLevel} from "./log";
 
 /* Classes */
 class ExpressApp {
@@ -46,9 +46,13 @@ class ExpressApp {
 	private server: http.Server;
 	private log: Logger;
 
-	constructor() {
+	constructor(log?: Logger) {
 		this.app = express();
 		this.configureApp();
+		if(log)
+			this.log = log;
+		else
+			this.log = new Logger(LogLevel.INFO);
 	}
 	/* Private Methods */
 	private configureApp() {
@@ -70,7 +74,8 @@ class ExpressApp {
 	}
 
 	public setLogger(log: Logger) {
-		this.log = log;
+		if(log)
+			this.log = log;
 	}
 
 	public getLogger(): Logger {
@@ -81,8 +86,7 @@ class ExpressApp {
 	public listen(callback?: Function) {
 		const _this = this;
 		this.server = this.app.listen(this.app.get("port"), function(){
-			if(_this.log)
-				_this.log.i("Express Server Listening on " + _this.app.get("port"));
+			_this.log.i("Express Server Listening on " + _this.app.get("port"));
 			if(callback)
 				callback();
 		});
@@ -94,18 +98,15 @@ class ExpressApp {
 			callback();
 			return;
 		}
-		if(this.log)
-			this.log.i("Stopping Express Server (10s timeout)...");
+		this.log.i("Stopping Express Server (10s timeout)...");
 
 		this.server.close(function() {
-			if(_this.log)
-				_this.log.i("Express Server Stopped.");
+			_this.log.i("Express Server Stopped.");
 			callback();
 		});
 
 		setTimeout(function() {
-			if(_this.log)
-				_this.log.w("Express Failed to Close Connections!");
+			_this.log.w("Express Failed to Close Connections!");
 			callback();
 		}, 10000); //timeout after 10 sec
 	}

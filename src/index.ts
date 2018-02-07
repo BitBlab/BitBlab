@@ -47,8 +47,7 @@ function stopServer() {
 	app.stop(function() {
 		db.close().then((success: boolean) => {
 			if(!success)
-				if(log)
-					log.e("Database did not close nicely!");
+				log.e("Database did not close nicely!");
 			log.i("Process Exiting.");
 			process.exit();
 		});
@@ -60,7 +59,7 @@ process.on("SIGTERM", stopServer);
 process.on("SIGINT", stopServer);
 
 /* Program Main */
-log.i("Starting BitBlab...")
+log.i("Starting BitBlab...");
 
 
 db = new Database(DB_FILE, function(success: boolean){
@@ -68,7 +67,7 @@ db = new Database(DB_FILE, function(success: boolean){
 		log.f("Required Database Setup Failed! Shutting down.");
 		stopServer();
 	}else{
-		log.i("Database Ready!")
+		log.i("Database Ready!");
 		app.setLogger(log);
 		app.listen(function(){
 			ss = new SocketServer(app, log);

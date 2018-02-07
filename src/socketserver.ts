@@ -26,7 +26,7 @@ import * as socketio from "socket.io"
 
 import {ExpressApp} from "./expressapp"
 import {User}       from "./user"
-import {Logger}     from "./log"
+import {Logger, LogLevel} from "./log"
 
 /* Classes */
 class SocketServer {
@@ -40,11 +40,12 @@ class SocketServer {
 		this.app = app;
 		if(log)
 			this.log = log;
+		else
+			this.log = new Logger(LogLevel.INFO);
 		this.io = socketio.listen(app.getServer());
 
 		this.setupServer();
-		if(this.log)
-			this.log.i("Socket.IO Server Configured and Listening");
+		this.log.i("Socket.IO Server Configured and Listening");
 	}
 
 	/* Private Methods */
@@ -54,8 +55,7 @@ class SocketServer {
 		let _this = this;
 
 		io.sockets.on("connection", function(socket) {
-			if(log)
-				log.d("Socket Connected: " + socket.id);
+			log.d("Socket Connected: " + socket.id);
 			var user = new User(socket);
 			_this.users.push(user);
 		});
@@ -63,7 +63,8 @@ class SocketServer {
 
 	/* Getters and Setters */
 	public setLogger(log: Logger) {
-		this.log = log;
+		if(log)
+			this.log = log;
 	}
 	public getLogger(): Logger {
 		return this.log;
