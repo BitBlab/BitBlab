@@ -59,10 +59,10 @@ class Database {
             this.log = new Logger(LogLevel.INFO);
         }
 
-		
-		var fileExists = fs.existsSync(filePath);
 
-		this.db = new sqlite.Database(filePath, sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE, function(err){
+        const fileExists = fs.existsSync(filePath);
+
+        this.db = new sqlite.Database(filePath, sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE, function(err){
 			if(err) {
 				_this.error = true;
                 _this.log.f("Failed to open database '" + filePath + "'!");
@@ -108,32 +108,30 @@ class Database {
 		 * note: this is not supposed to check if the tables are correct, see
 		 * checkIntegrity() for that
 		 */
-		 let db = this.db;
-		 let log = this.log;
-		 var promise = new Promise<boolean>(
-		 	(resolve, reject) =>
-		 		{
-		 			if(db === undefined)
-		 				reject();
-		 			else {
-		 				db.all("SELECT name FROM sqlite_master WHERE type='table' AND NOT name='sqlite_master'", 
-		 					(err, rows) => 
-		 						{
-		 							if(err) {
-		 								log.e("Database check query failed! " + err);
-		 								reject(err);
-		 							}
-		 							if(rows && rows.length > 0)
-		 								resolve(true);
-		 							else
-		 								resolve(false);
-		 						}
-		 					);
-		 			}
-		 		}
-		 	);
+		let db = this.db;
+		let log = this.log;
+        const promise = new Promise<boolean>(
+            (resolve, reject) => {
+                if (db === undefined)
+                    reject();
+                else {
+                    db.all("SELECT name FROM sqlite_master WHERE type='table' AND NOT name='sqlite_master'",
+                        (err, rows) => {
+                            if (err) {
+                                log.e("Database check query failed! " + err);
+                                reject(err);
+                            }
+                            if (rows && rows.length > 0)
+                                resolve(true);
+                            else
+                                resolve(false);
+                        }
+                    );
+                }
+            }
+        );
 
-		return promise;
+        return promise;
 	}
 	private checkIntegrity(): Promise<boolean> {
 		/* todo here: do quick checks on the tables.
@@ -141,72 +139,72 @@ class Database {
 		 * if not, attempt to fix them (if possible)
 		 * if fixing succeeds, return true, else return false
 		 */
-		 let db = this.db;
-		 let log = this.log;
-		 var promise = new Promise<boolean>(
-		 	(resolve, reject) => {
-		 		if(!db)
-		 			reject();
+		let db = this.db;
+		let log = this.log;
+        const promise = new Promise<boolean>(
+            (resolve, reject) => {
+                if (!db)
+                    reject();
 
-		 		db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'", (err, row) => {
-		 			if(err){
-		 				log.e(err);
-		 				resolve(false);
-		 			}
-		 			else{
-		 			    var cmp = TABLE_USER_SQL.replace("IF NOT EXISTS ", "");
-		 				if(row.sql != cmp){
-		 					log.d(row.sql);
-		 					log.d(cmp);
-		 					resolve(false);
-		 				}
-		 				else {
-		 					db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='rooms'", (err, row) => {
-		 						if(err){
-					 				log.e(err);
-					 				resolve(false);
-					 			}
-					 			else{
-                                    var cmp = TABLE_ROOM_SQL.replace("IF NOT EXISTS ", "");
-					 				if(row.sql != cmp){
-					 					log.d(row.sql);
-					 					resolve(false);
-					 				}else
-					 					resolve(true);
-					 			}
-		 					});
-		 				}
-		 			}
-		 		});
-		 	}
-		 );
+                db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'", (err, row) => {
+                    if (err) {
+                        log.e(err);
+                        resolve(false);
+                    }
+                    else {
+                        const cmp = TABLE_USER_SQL.replace("IF NOT EXISTS ", "");
+                        if (row.sql != cmp) {
+                            log.d(row.sql);
+                            log.d(cmp);
+                            resolve(false);
+                        }
+                        else {
+                            db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='rooms'", (err, row) => {
+                                if (err) {
+                                    log.e(err);
+                                    resolve(false);
+                                }
+                                else {
+                                    const cmp = TABLE_ROOM_SQL.replace("IF NOT EXISTS ", "");
+                                    if (row.sql != cmp) {
+                                        log.d(row.sql);
+                                        resolve(false);
+                                    } else
+                                        resolve(true);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        );
 
-		return promise;
+        return promise;
 	}
 	private initDB(): Promise<void> {
 		/* todo here: create a new database with the correct table structure.
 		 * this should only be called by the constructor if isAlreadyDB() is false
 		 */
-		 let db = this.db;
-		 var promise = new Promise<void>(
-		 	(resolve, reject) => {
-		 		db.run(TABLE_USER_SQL, (err) => {
-		 			if(!err) {
-		 				db.run(TABLE_ROOM_SQL, (err) => {
-			 				if(err)
-			 					reject(err);
-			 				else
-			 					resolve();
-			 			});
-		 			}else{
-		 				reject(err);
-		 			}
-		 		});
-		 	}
-		 );
+		let db = this.db;
+        const promise = new Promise<void>(
+            (resolve, reject) => {
+                db.run(TABLE_USER_SQL, (err) => {
+                    if (!err) {
+                        db.run(TABLE_ROOM_SQL, (err) => {
+                            if (err)
+                                reject(err);
+                            else
+                                resolve();
+                        });
+                    } else {
+                        reject(err);
+                    }
+                });
+            }
+        );
 
 
-		 return promise;
+        return promise;
 	}
 
 	/* Meta Getters and Setters */
@@ -227,25 +225,25 @@ class Database {
 	public close(): Promise<boolean> {
 		let log = this.log;
 		let db = this.db;
-		var promise = new Promise<boolean>(
-			(resolve, reject) => {
-				if(!db) {
-					reject();
-					return;
-				}
-				if(log)
-					log.i("Closing Database...");
-				db.close((err) => {
-					if(err) {
-						log.e(err);
-						resolve(false);
-					}else{
-						resolve(true);
-					}
-				});
-			}
-		);
-		return promise;
+        const promise = new Promise<boolean>(
+            (resolve, reject) => {
+                if (!db) {
+                    reject();
+                    return;
+                }
+                if (log)
+                    log.i("Closing Database...");
+                db.close((err) => {
+                    if (err) {
+                        log.e(err);
+                        resolve(false);
+                    } else {
+                        resolve(true);
+                    }
+                });
+            }
+        );
+        return promise;
 	}
 
 	/* Database Operation Methods */

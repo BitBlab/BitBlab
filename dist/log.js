@@ -28,7 +28,7 @@ class Logger {
     log(level, msg) {
         if (level < this.level)
             return;
-        var out = "[" + this.TAG[level] + "] " + msg;
+        let out = "[" + this.TAG[level] + "] " + msg;
         if (this.colorful) {
             out = colors.bold(out);
             switch (level) {

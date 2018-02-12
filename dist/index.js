@@ -6,9 +6,9 @@ const socketserver_1 = require("./socketserver");
 const log_1 = require("./log");
 const DB_FILE = "db.sqlite";
 const log = new log_1.Logger(log_1.LogLevel.DEBUG, true);
-var app = new expressapp_1.ExpressApp();
-var ss;
-var db;
+const app = new expressapp_1.ExpressApp();
+let ss;
+let db;
 function stopServer() {
     log.i("Stopping BitBlab...");
     app.stop(function () {

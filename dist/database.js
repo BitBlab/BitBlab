@@ -27,7 +27,7 @@ class Database {
         else {
             this.log = new log_1.Logger(log_1.LogLevel.INFO);
         }
-        var fileExists = fs.existsSync(filePath);
+        const fileExists = fs.existsSync(filePath);
         this.db = new sqlite.Database(filePath, sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE, function (err) {
             if (err) {
                 _this.error = true;
@@ -67,7 +67,7 @@ class Database {
     isAlreadyDB() {
         let db = this.db;
         let log = this.log;
-        var promise = new Promise((resolve, reject) => {
+        const promise = new Promise((resolve, reject) => {
             if (db === undefined)
                 reject();
             else {
@@ -88,7 +88,7 @@ class Database {
     checkIntegrity() {
         let db = this.db;
         let log = this.log;
-        var promise = new Promise((resolve, reject) => {
+        const promise = new Promise((resolve, reject) => {
             if (!db)
                 reject();
             db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'", (err, row) => {
@@ -97,7 +97,7 @@ class Database {
                     resolve(false);
                 }
                 else {
-                    var cmp = TABLE_USER_SQL.replace("IF NOT EXISTS ", "");
+                    const cmp = TABLE_USER_SQL.replace("IF NOT EXISTS ", "");
                     if (row.sql != cmp) {
                         log.d(row.sql);
                         log.d(cmp);
@@ -110,7 +110,7 @@ class Database {
                                 resolve(false);
                             }
                             else {
-                                var cmp = TABLE_ROOM_SQL.replace("IF NOT EXISTS ", "");
+                                const cmp = TABLE_ROOM_SQL.replace("IF NOT EXISTS ", "");
                                 if (row.sql != cmp) {
                                     log.d(row.sql);
                                     resolve(false);
@@ -127,7 +127,7 @@ class Database {
     }
     initDB() {
         let db = this.db;
-        var promise = new Promise((resolve, reject) => {
+        const promise = new Promise((resolve, reject) => {
             db.run(TABLE_USER_SQL, (err) => {
                 if (!err) {
                     db.run(TABLE_ROOM_SQL, (err) => {
@@ -159,7 +159,7 @@ class Database {
     close() {
         let log = this.log;
         let db = this.db;
-        var promise = new Promise((resolve, reject) => {
+        const promise = new Promise((resolve, reject) => {
             if (!db) {
                 reject();
                 return;

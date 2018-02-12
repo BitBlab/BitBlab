@@ -20,7 +20,7 @@ class SocketServer {
         let _this = this;
         io.sockets.on("connection", function (socket) {
             log.d("Socket Connected: " + socket.id);
-            var user = new user_1.User(socket);
+            const user = new user_1.User(socket);
             _this.users.push(user);
         });
     }

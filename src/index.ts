@@ -37,9 +37,9 @@ const DB_FILE = "db.sqlite";
 
 /* Globals */
 const log = new Logger(LogLevel.DEBUG, true);
-var app = new ExpressApp();
-var ss: SocketServer;
-var db: Database;
+const app = new ExpressApp();
+let ss: SocketServer;
+let db: Database;
 
 /* Functions */
 function stopServer() {

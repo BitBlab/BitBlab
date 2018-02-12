@@ -56,8 +56,8 @@ class SocketServer {
 
 		io.sockets.on("connection", function(socket) {
 			log.d("Socket Connected: " + socket.id);
-			var user = new User(socket);
-			_this.users.push(user);
+            const user = new User(socket);
+            _this.users.push(user);
 		});
 	}
 
