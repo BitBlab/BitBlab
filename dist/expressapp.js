@@ -9,10 +9,15 @@ const bodyParser = require("body-parser");
 const methodOverride = require("method-override");
 const serveStatic = require("serve-static");
 const path = require("path");
+const log_1 = require("./log");
 class ExpressApp {
-    constructor() {
+    constructor(log) {
         this.app = express();
         this.configureApp();
+        if (log)
+            this.log = log;
+        else
+            this.log = new log_1.Logger(log_1.LogLevel.INFO);
     }
     configureApp() {
         this.app.set('port', process.env.PORT || PORT);
@@ -29,7 +34,8 @@ class ExpressApp {
         return this.server;
     }
     setLogger(log) {
-        this.log = log;
+        if (log)
+            this.log = log;
     }
     getLogger() {
         return this.log;
@@ -37,8 +43,7 @@ class ExpressApp {
     listen(callback) {
         const _this = this;
         this.server = this.app.listen(this.app.get("port"), function () {
-            if (_this.log)
-                _this.log.i("Express Server Listening on " + _this.app.get("port"));
+            _this.log.i("Express Server Listening on " + _this.app.get("port"));
             if (callback)
                 callback();
         });
@@ -49,16 +54,13 @@ class ExpressApp {
             callback();
             return;
         }
-        if (this.log)
-            this.log.i("Stopping Express Server (10s timeout)...");
+        this.log.i("Stopping Express Server (10s timeout)...");
         this.server.close(function () {
-            if (_this.log)
-                _this.log.i("Express Server Stopped.");
+            _this.log.i("Express Server Stopped.");
             callback();
         });
         setTimeout(function () {
-            if (_this.log)
-                _this.log.w("Express Failed to Close Connections!");
+            _this.log.w("Express Failed to Close Connections!");
             callback();
         }, 10000);
     }

@@ -7,7 +7,7 @@ declare class ExpressApp {
     private app;
     private server;
     private log;
-    constructor();
+    constructor(log?: Logger);
     private configureApp();
     getApp(): express.Express;
     getServer(): http.Server;

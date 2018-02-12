@@ -14,8 +14,7 @@ function stopServer() {
     app.stop(function () {
         db.close().then((success) => {
             if (!success)
-                if (log)
-                    log.e("Database did not close nicely!");
+                log.e("Database did not close nicely!");
             log.i("Process Exiting.");
             process.exit();
         });

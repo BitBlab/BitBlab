@@ -154,8 +154,10 @@ class Database {
 		 				resolve(false);
 		 			}
 		 			else{
-		 				if(row.sql != TABLE_USER_SQL){
+		 			    var cmp = TABLE_USER_SQL.replace("IF NOT EXISTS ", "");
+		 				if(row.sql != cmp){
 		 					log.d(row.sql);
+		 					log.d(cmp);
 		 					resolve(false);
 		 				}
 		 				else {
@@ -165,7 +167,8 @@ class Database {
 					 				resolve(false);
 					 			}
 					 			else{
-					 				if(row.sql != TABLE_ROOM_SQL){
+                                    var cmp = TABLE_ROOM_SQL.replace("IF NOT EXISTS ", "");
+					 				if(row.sql != cmp){
 					 					log.d(row.sql);
 					 					resolve(false);
 					 				}else

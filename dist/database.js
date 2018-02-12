@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const sqlite = require("sqlite3");
 const fs = require("fs");
+const log_1 = require("./log");
 const TABLE_USER_SQL = "CREATE TABLE IF NOT EXISTS users (" +
     "id PRIMARY KEY," +
     "username text NOT NULL," +
@@ -23,33 +24,31 @@ class Database {
         let _this = this;
         if (log)
             this.log = log;
+        else {
+            this.log = new log_1.Logger(log_1.LogLevel.INFO);
+        }
         var fileExists = fs.existsSync(filePath);
         this.db = new sqlite.Database(filePath, sqlite.OPEN_READWRITE | sqlite.OPEN_CREATE, function (err) {
             if (err) {
                 _this.error = true;
-                if (log) {
-                    log.f("Failed to open database '" + filePath + "'!");
-                    log.f("Error Message: " + err);
-                }
+                _this.log.f("Failed to open database '" + filePath + "'!");
+                _this.log.f("Error Message: " + err);
                 if (callback)
                     callback(false);
             }
             else {
                 _this.isAlreadyDB().then(function (isDB) {
                     if (isDB) {
-                        if (log)
-                            log.d("is db");
+                        _this.log.d("is db");
                         return _this.checkIntegrity();
                     }
                     else {
-                        if (log)
-                            log.d("is not db");
+                        _this.log.d("is not db");
                         return _this.initDB();
                     }
                 }).then((val) => {
                     if (val !== undefined && val === false) {
-                        if (log)
-                            log.e("Database failed integrity check!");
+                        _this.log.e("Database failed integrity check!");
                         if (callback)
                             callback(false);
                         return;
@@ -58,8 +57,7 @@ class Database {
                     if (callback)
                         callback(true);
                 }).catch(() => {
-                    if (log)
-                        log.f("Database Error During Initialization!");
+                    _this.log.f("Database Error During Initialization!");
                     if (callback)
                         callback(false);
                 });
@@ -95,27 +93,26 @@ class Database {
                 reject();
             db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'", (err, row) => {
                 if (err) {
-                    if (log)
-                        log.e(err);
+                    log.e(err);
                     resolve(false);
                 }
                 else {
-                    if (row.sql != TABLE_USER_SQL) {
-                        if (log)
-                            log.d(row.sql);
+                    var cmp = TABLE_USER_SQL.replace("IF NOT EXISTS ", "");
+                    if (row.sql != cmp) {
+                        log.d(row.sql);
+                        log.d(cmp);
                         resolve(false);
                     }
                     else {
                         db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='rooms'", (err, row) => {
                             if (err) {
-                                if (log)
-                                    log.e(err);
+                                log.e(err);
                                 resolve(false);
                             }
                             else {
-                                if (row.sql != TABLE_ROOM_SQL) {
-                                    if (log)
-                                        log.d(row.sql);
+                                var cmp = TABLE_ROOM_SQL.replace("IF NOT EXISTS ", "");
+                                if (row.sql != cmp) {
+                                    log.d(row.sql);
                                     resolve(false);
                                 }
                                 else
@@ -171,8 +168,7 @@ class Database {
                 log.i("Closing Database...");
             db.close((err) => {
                 if (err) {
-                    if (log)
-                        log.e(err);
+                    log.e(err);
                     resolve(false);
                 }
                 else {
